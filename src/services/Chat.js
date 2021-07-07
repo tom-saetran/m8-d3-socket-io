@@ -3,7 +3,7 @@ import RoomModel from "../models/Room/index.js"
 
 const chatRouter = express.Router()
 
-chatRouter.post('/room', async (req, res) => {
+chatRouter.post("/room", async (req, res) => {
     const room = new RoomModel(req.body)
     await room.save()
 
@@ -14,6 +14,5 @@ chatRouter.get("/room/:name", async (req, res) => {
     const room = await RoomModel.findOne({ name: req.params.name })
     res.status(200).send({ chatHistory: room.chatHistory })
 })
-
 
 export default chatRouter

@@ -7,19 +7,17 @@ import list from "express-list-endpoints"
 import mongoose from "mongoose"
 import RoomModel from "./models/Room/index.js"
 
-const app = express();
+const app = express()
 app.use(cors())
 app.use(express.json())
 
-
-const server = createServer(app);
+const server = createServer(app)
 const io = new Server(server, { allowEIO3: true })
 
 let onlineUsers = []
 
 // Add "event listeners" on your socket when it's connecting
 io.on("connection", socket => {
-
     console.log(socket.id)
 
     console.log(socket.rooms)
@@ -52,35 +50,31 @@ io.on("connection", socket => {
     })
 
     socket.on("sendMessage", async ({ message, room }) => {
-
-        await RoomModel.findOneAndUpdate({ name: room }, {
-            $push: { chatHistory: message }
-        })
+        await RoomModel.findOneAndUpdate(
+            { name: room },
+            {
+                $push: { chatHistory: message }
+            }
+        )
 
         socket.to(room).emit("message", message)
     })
-
-
 })
 
-
-app.get('/online-users', (req, res) => {
+app.get("/online-users", (req, res) => {
     res.status(200).send({ onlineUsers })
 })
 
-app.use('/', chatRouter)
-
+app.use("/", chatRouter)
 
 const port = 3030
 
-mongoose
-    .connect(process.env.ATLAS_URL, { useNewUrlParser: true })
-    .then(() => {
-        console.log("Connected to mongo")
-        // Listen using the httpServer -
-        // listening with the express instance will start a new one!!
-        server.listen(port, () => {
-            console.log(list(app))
-            console.log("Server listening on port " + port)
-        })
+mongoose.connect(process.env.MONGO_DB, { useNewUrlParser: true }).then(() => {
+    console.log("Connected to mongo")
+    // Listen using the httpServer -
+    // listening with the express instance will start a new one!!
+    server.listen(port, () => {
+        console.table(list(app))
+        console.log("Server listening on port", port)
     })
+})
